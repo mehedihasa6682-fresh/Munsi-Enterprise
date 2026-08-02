@@ -36,37 +36,7 @@ jobs:
         run: |
           if [ ! -f ./app/google-services.json ]; then
             echo "Creating fallback google-services.json for build..."
-            cat << 'EOF' > ./app/google-services.json
-            {
-              "project_info": {
-                "project_number": "745870059059",
-                "project_id": "munsi-b272a",
-                "storage_bucket": "munsi-b272a.firebasestorage.app"
-              },
-              "client": [
-                {
-                  "client_info": {
-                    "mobilesdk_app_id": "1:745870059059:android:2b65b39dc90d40ecc5e546",
-                    "android_client_info": {
-                      "package_name": "com.aistudio.ordercut.app"
-                    }
-                  },
-                  "oauth_client": [],
-                  "api_key": [
-                    {
-                      "current_key": "AIzaSyBIJMMMOg2rPmNvRnI8zIPAt-jVPk57dzA"
-                    }
-                  ],
-                  "services": {
-                    "appinvite_service": {
-                      "other_platform_oauth_client": []
-                    }
-                  }
-                }
-              ],
-              "configuration_version": "1"
-            }
-            EOF
+            echo '{"project_info":{"project_number":"745870059059","project_id":"munsi-b272a","storage_bucket":"munsi-b272a.firebasestorage.app"},"client":[{"client_info":{"mobilesdk_app_id":"1:745870059059:android:2b65b39dc90d40ecc5e546","android_client_info":{"package_name":"com.aistudio.ordercut.app"}},"oauth_client":[],"api_key":[{"current_key":"AIzaSyBIJMMMOg2rPmNvRnI8zIPAt-jVPk57dzA"}],"services":{"appinvite_service":{"other_platform_oauth_client":[]}}}],"configuration_version":"1"}' > ./app/google-services.json
           fi
 
       - name: Build Release APK
