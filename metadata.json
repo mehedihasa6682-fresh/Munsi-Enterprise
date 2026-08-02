@@ -1,0 +1,6 @@
+{
+  "name": "OrderCut Sales & Stock",
+  "description": "অর্ডার কাটিং, রোল-ভিত্তিক প্যানেল, ইনভেন্টরি, লাইভ ট্র্যাকিং, অনলাইন পেমেন্ট ও ইনভয়েস পিডিএফ জেনারেটর",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
