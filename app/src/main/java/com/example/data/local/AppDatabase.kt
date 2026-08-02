@@ -76,16 +76,128 @@ abstract class AppDatabase : RoomDatabase() {
             retailerDao: RetailerDao,
             srLocationDao: SrLocationDao
         ) {
-            // Seed Initial FMCG / Consumer Goods Products
+            // Seed Initial FMCG / Consumer Goods Products with Images & Units (KG, Liter, Bag, Pack, Box)
             val initialProducts = listOf(
-                ProductEntity(name = "Fresh Fortified Soybean Oil 5L", nameBangla = "ফ্রেশ সয়াবিন তেল ৫ লিটার", category = "খাদ্য ও তেল", price = 820.0, tradeOfferPrice = 790.0, stockQuantity = 120, minStockThreshold = 25, unit = "বোতল", code = "OIL-5L"),
-                ProductEntity(name = "Pran Premium Miniket Rice 25kg", nameBangla = "প্রাণ মিনিকেট চাল ২৫ কেজি", category = "চাল ও দানা", price = 1750.0, tradeOfferPrice = 1700.0, stockQuantity = 80, minStockThreshold = 20, unit = "বস্তা", code = "RICE-25K"),
-                ProductEntity(name = "Teer Refined Sugar 1kg Pack", nameBangla = "তীর পরিশোধিত চিনি ১ কেজী", category = "চিনি ও গুঁড়া", price = 135.0, tradeOfferPrice = 130.0, stockQuantity = 200, minStockThreshold = 40, unit = "প্যাক", code = "SGR-1K"),
-                ProductEntity(name = "Ispahani Mirzapore Tea Bag 100s", nameBangla = "ইস্পাহানি মির্জাপুর টি ব্যাগ", category = "চা ও পানীয়", price = 240.0, tradeOfferPrice = 225.0, stockQuantity = 18, minStockThreshold = 30, unit = "বক্স", code = "TEA-100"),
-                ProductEntity(name = "ACI Pure Salt 1kg", nameBangla = "এসিআই পিওর লবণ ১ কেজি", category = "মশলা ও লবণ", price = 42.0, tradeOfferPrice = 39.0, stockQuantity = 350, minStockThreshold = 50, unit = "প্যাক", code = "SLT-1K"),
-                ProductEntity(name = "Ruchi Chanachur Spicy 200g", nameBangla = "রুচি চানাচুর ঝাল ২০০ গ্রাম", category = "স্ন্যাক্স", price = 50.0, tradeOfferPrice = 45.0, stockQuantity = 12, minStockThreshold = 35, unit = "প্যাক", code = "SNC-200"),
-                ProductEntity(name = "Wheel Washing Powder 1kg", nameBangla = "হুইল ওয়াশিং পাউডার ১ কেজি", category = "ডিটারজেন্ট", price = 130.0, tradeOfferPrice = 122.0, stockQuantity = 140, minStockThreshold = 30, unit = "প্যাক", code = "DET-1K"),
-                ProductEntity(name = "Lux Velvet Glow Soap 100g Pack", nameBangla = "লাক্স সাবান ১০০ গ্রাম", category = "প্রসাধন", price = 65.0, tradeOfferPrice = 60.0, stockQuantity = 220, minStockThreshold = 40, unit = "পিস", code = "SOP-100")
+                ProductEntity(
+                    name = "Fresh Fortified Soybean Oil 5L",
+                    nameBangla = "ফ্রেশ সয়াবিন তেল ৫ লিটার",
+                    category = "খাদ্য ও তেল",
+                    price = 820.0,
+                    tradeOfferPrice = 790.0,
+                    stockQuantity = 120,
+                    minStockThreshold = 25,
+                    unit = "লিটার (বোতল)",
+                    code = "OIL-5L",
+                    imageUrl = "https://images.unsplash.com/photo-1620706857370-e1b9770e8bb1?auto=format&fit=crop&w=500&q=80"
+                ),
+                ProductEntity(
+                    name = "Pran Premium Miniket Rice 25kg Bag",
+                    nameBangla = "প্রাণ প্রিমিয়াম মিনিকেট চাল ২৫ কেজি বস্তা",
+                    category = "চাল ও দানা",
+                    price = 1750.0,
+                    tradeOfferPrice = 1700.0,
+                    stockQuantity = 85,
+                    minStockThreshold = 20,
+                    unit = "কেজি (বস্তা)",
+                    code = "RICE-25K",
+                    imageUrl = "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=500&q=80"
+                ),
+                ProductEntity(
+                    name = "Teer Refined Sugar 1kg Pack",
+                    nameBangla = "তীর পরিশোধিত চিনি ১ কেজি প্যাক",
+                    category = "চিনি ও গুঁড়া",
+                    price = 135.0,
+                    tradeOfferPrice = 130.0,
+                    stockQuantity = 220,
+                    minStockThreshold = 40,
+                    unit = "কেজি (প্যাক)",
+                    code = "SGR-1K",
+                    imageUrl = "https://images.unsplash.com/photo-1581600140682-d4e68c8cde32?auto=format&fit=crop&w=500&q=80"
+                ),
+                ProductEntity(
+                    name = "Ispahani Mirzapore Premium Tea 500g",
+                    nameBangla = "ইস্পাহানি মির্জাপুর চা ৫০০ গ্রাম প্যাক",
+                    category = "চা ও পানীয়",
+                    price = 240.0,
+                    tradeOfferPrice = 225.0,
+                    stockQuantity = 18,
+                    minStockThreshold = 30,
+                    unit = "প্যাক (গ্রাম)",
+                    code = "TEA-500G",
+                    imageUrl = "https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=500&q=80"
+                ),
+                ProductEntity(
+                    name = "ACI Pure Iodine Salt 1kg",
+                    nameBangla = "এসিআই পিওর আয়োডিনযুক্ত লবণ ১ কেজি",
+                    category = "মশলা ও লবণ",
+                    price = 42.0,
+                    tradeOfferPrice = 39.0,
+                    stockQuantity = 350,
+                    minStockThreshold = 50,
+                    unit = "কেজি (প্যাক)",
+                    code = "SLT-1K",
+                    imageUrl = "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&w=500&q=80"
+                ),
+                ProductEntity(
+                    name = "Ruchi Jhal Chanachur 200g Box",
+                    nameBangla = "রুচি ঝাল চানাচুর ২০০ গ্রাম (২৪ পিস কার্টন)",
+                    category = "স্ন্যাক্স",
+                    price = 50.0,
+                    tradeOfferPrice = 45.0,
+                    stockQuantity = 12,
+                    minStockThreshold = 35,
+                    unit = "কার্টন (পিস)",
+                    code = "SNC-CTN",
+                    imageUrl = "https://images.unsplash.com/photo-1599490659213-e2b9527bd087?auto=format&fit=crop&w=500&q=80"
+                ),
+                ProductEntity(
+                    name = "Wheel Washing Powder 1kg Pack",
+                    nameBangla = "হুইল ওয়াশিং পাউডার ১ কেজি প্যাক",
+                    category = "ডিটারজেন্ট",
+                    price = 130.0,
+                    tradeOfferPrice = 122.0,
+                    stockQuantity = 140,
+                    minStockThreshold = 30,
+                    unit = "কেজি (প্যাক)",
+                    code = "DET-1K",
+                    imageUrl = "https://images.unsplash.com/photo-1585842378054-ee2e52f94ba2?auto=format&fit=crop&w=500&q=80"
+                ),
+                ProductEntity(
+                    name = "Lux Velvet Glow Soap 100g Bar",
+                    nameBangla = "লাক্স সাবান ১০০ গ্রাম (৬ পিস প্যাক)",
+                    category = "প্রসাধন",
+                    price = 65.0,
+                    tradeOfferPrice = 60.0,
+                    stockQuantity = 220,
+                    minStockThreshold = 40,
+                    unit = "পিস",
+                    code = "SOP-100",
+                    imageUrl = "https://images.unsplash.com/photo-1607006482802-613d52dd2d4e?auto=format&fit=crop&w=500&q=80"
+                ),
+                ProductEntity(
+                    name = "Teer Whole Wheat Atta 2kg Bag",
+                    nameBangla = "তীর হোল গমের আটা ২ কেজি প্যাক",
+                    category = "চাল ও দানা",
+                    price = 120.0,
+                    tradeOfferPrice = 112.0,
+                    stockQuantity = 160,
+                    minStockThreshold = 30,
+                    unit = "কেজি (প্যাক)",
+                    code = "ATTA-2K",
+                    imageUrl = "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=500&q=80"
+                ),
+                ProductEntity(
+                    name = "Radhuni Turmeric Powder 200g Pack",
+                    nameBangla = "রাঁধুনী গুঁড়া হলুদ ২০০ গ্রাম",
+                    category = "মশলা ও লবণ",
+                    price = 95.0,
+                    tradeOfferPrice = 88.0,
+                    stockQuantity = 110,
+                    minStockThreshold = 25,
+                    unit = "প্যাক (গ্রাম)",
+                    code = "SPICE-TRM",
+                    imageUrl = "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=500&q=80"
+                )
             )
             productDao.insertProducts(initialProducts)
 

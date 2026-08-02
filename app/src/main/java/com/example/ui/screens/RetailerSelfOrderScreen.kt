@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,7 +19,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.LocalOffer
 import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material.icons.filled.Store
@@ -34,10 +35,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.data.local.entities.ProductEntity
 import com.example.data.local.entities.RetailerEntity
 import com.example.data.repository.CartItem
@@ -98,7 +104,7 @@ fun RetailerSelfOrderScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "ট্রেড অফার ও কোম্পানি ডিরেক্ট ডিসকাউন্ট চলোমান",
+                        text = "ট্রেড অফার ও ডিরেক্ট কারখানা ডিসকাউন্ট চলোমান",
                         fontSize = 10.sp,
                         color = Color(0xFF4ADE80),
                         fontWeight = FontWeight.Bold
@@ -114,14 +120,14 @@ fun RetailerSelfOrderScreen(
         }
 
         Text(
-            text = "সরাসরি কোম্পানি প্রডাক্ট ক্যাটালগ (Self-Order Catalog):",
+            text = "সরাসরি কারখানা ক্যাটালগ (Self-Order Store):",
             fontSize = 13.sp,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF0F172A),
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
         )
 
-        // Products Grid
+        // Products Grid with E-Commerce Photos
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             contentPadding = PaddingValues(12.dp),
@@ -135,75 +141,100 @@ fun RetailerSelfOrderScreen(
                 Card(
                     shape = RoundedCornerShape(14.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                     modifier = Modifier
                         .fillMaxWidth()
                         .testTag("self_order_item_${product.id}")
                 ) {
                     Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        verticalArrangement = Arrangement.SpaceBetween
+                        modifier = Modifier.fillMaxWidth()
                     ) {
+                        // Product Photo
                         Box(
                             modifier = Modifier
-                                .clip(RoundedCornerShape(6.dp))
-                                .background(Color(0xFFEF4444).copy(alpha = 0.1f))
-                                .padding(horizontal = 6.dp, vertical = 2.dp)
+                                .fillMaxWidth()
+                                .aspectRatio(1.2f)
+                                .background(Color(0xFFF1F5F9)),
+                            contentAlignment = Alignment.Center
                         ) {
-                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-                                Icon(Icons.Default.LocalOffer, contentDescription = "Offer", tint = Color(0xFFDC2626), modifier = Modifier.size(10.dp))
-                                Text("ট্রেড প্রাইস ছাড়", fontSize = 9.sp, color = Color(0xFFDC2626), fontWeight = FontWeight.Bold)
+                            if (product.imageUrl.isNotEmpty()) {
+                                AsyncImage(
+                                    model = ImageRequest.Builder(LocalContext.current)
+                                        .data(product.imageUrl)
+                                        .crossfade(true)
+                                        .build(),
+                                    contentDescription = product.nameBangla,
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier.fillMaxSize()
+                                )
+                            } else {
+                                Icon(Icons.Default.Image, contentDescription = "No Image", tint = Color.Gray)
+                            }
+
+                            Box(
+                                modifier = Modifier
+                                    .align(Alignment.TopStart)
+                                    .padding(6.dp)
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(Color(0xFFDC2626))
+                                    .padding(horizontal = 5.dp, vertical = 2.dp)
+                            ) {
+                                Text("অফার প্রাইস", fontSize = 9.sp, color = Color.White, fontWeight = FontWeight.Bold)
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(6.dp))
-
-                        Text(
-                            text = product.nameBangla,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF0F172A),
-                            maxLines = 2
-                        )
-
-                        Text(
-                            text = "${product.unit} • ${product.code}",
-                            fontSize = 10.sp,
-                            color = Color(0xFF64748B)
-                        )
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(10.dp)
                         ) {
-                            Column {
-                                Text(
-                                    text = "৳${product.tradeOfferPrice}",
-                                    fontSize = 13.sp,
-                                    fontWeight = FontWeight.ExtraBold,
-                                    color = Color(0xFF0284C7)
-                                )
-                                Text(
-                                    text = "৳${product.price}",
-                                    fontSize = 9.sp,
-                                    color = Color.Gray
-                                )
-                            }
+                            Text(
+                                text = product.nameBangla,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF0F172A),
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis
+                            )
 
-                            Button(
-                                onClick = { onAddToCart(product) },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = if (inCartQty > 0) Color(0xFF059669) else Color(0xFF0F172A)
-                                ),
-                                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
-                                shape = RoundedCornerShape(8.dp),
-                                modifier = Modifier.testTag("btn_self_add_${product.id}")
+                            Text(
+                                text = "${product.unit} • ${product.code}",
+                                fontSize = 10.sp,
+                                color = Color(0xFF64748B)
+                            )
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(if (inCartQty > 0) "$inCartQty টি" else "+ যোগ", fontSize = 11.sp)
+                                Column {
+                                    Text(
+                                        text = "৳${product.tradeOfferPrice}",
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = Color(0xFF0284C7)
+                                    )
+                                    Text(
+                                        text = "৳${product.price}",
+                                        fontSize = 9.sp,
+                                        color = Color.Gray
+                                    )
+                                }
+
+                                Button(
+                                    onClick = { onAddToCart(product) },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = if (inCartQty > 0) Color(0xFF059669) else Color(0xFF0F172A)
+                                    ),
+                                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
+                                    shape = RoundedCornerShape(8.dp),
+                                    modifier = Modifier.testTag("btn_self_add_${product.id}")
+                                ) {
+                                    Text(if (inCartQty > 0) "$inCartQty টি" else "+ যোগ", fontSize = 11.sp)
+                                }
                             }
                         }
                     }
