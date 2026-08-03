@@ -42,13 +42,29 @@ abstract class AppDatabase : RoomDatabase() {
 
         fun getDatabase(context: Context, scope: CoroutineScope): AppDatabase {
             return INSTANCE ?: synchronized(this) {
+                var dbRef: AppDatabase? = null
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
                     "ordercut_database"
                 )
-                    .addCallback(AppDatabaseCallback(scope))
+                    .fallbackToDestructiveMigration()
+                    .addCallback(object : RoomDatabase.Callback() {
+                        override fun onCreate(db: SupportSQLiteDatabase) {
+                            super.onCreate(db)
+                            scope.launch(Dispatchers.IO) {
+                                dbRef?.let { database ->
+                                    populateInitialData(
+                                        database.productDao(),
+                                        database.retailerDao(),
+                                        database.srLocationDao()
+                                    )
+                                }
+                            }
+                        }
+                    })
                     .build()
+                dbRef = instance
                 INSTANCE = instance
                 instance
             }
