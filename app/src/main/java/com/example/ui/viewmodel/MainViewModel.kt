@@ -11,6 +11,7 @@ import com.example.data.local.entities.SrLocationEntity
 import com.example.data.repository.CartItem
 import com.example.data.repository.OrderRepository
 import com.example.ui.model.UserRole
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -21,7 +22,7 @@ import java.io.File
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val db = AppDatabase.getDatabase(application, viewModelScope)
+    private val db = AppDatabase.getDatabase(application)
     private val repository = OrderRepository(
         context = application,
         productDao = db.productDao(),
@@ -29,6 +30,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         orderDao = db.orderDao(),
         srLocationDao = db.srLocationDao()
     )
+
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.seedInitialDataIfEmpty()
+        }
+    }
 
     val allProducts: StateFlow<List<ProductEntity>> = repository.allProducts
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())

@@ -13,6 +13,9 @@ interface ProductDao {
     @Query("SELECT * FROM products ORDER BY id ASC")
     fun getAllProducts(): Flow<List<ProductEntity>>
 
+    @Query("SELECT COUNT(*) FROM products")
+    suspend fun getProductCount(): Int
+
     @Query("SELECT * FROM products WHERE stockQuantity <= minStockThreshold ORDER BY stockQuantity ASC")
     fun getLowStockProducts(): Flow<List<ProductEntity>>
 

@@ -1,6 +1,7 @@
 package com.example.data.repository
 
 import android.content.Context
+import com.example.data.local.AppDatabase
 import com.example.data.local.dao.OrderDao
 import com.example.data.local.dao.ProductDao
 import com.example.data.local.dao.RetailerDao
@@ -34,6 +35,18 @@ class OrderRepository(
     val allRetailers: Flow<List<RetailerEntity>> = retailerDao.getAllRetailers()
     val allOrders: Flow<List<OrderEntity>> = orderDao.getAllOrders()
     val allSrLocations: Flow<List<SrLocationEntity>> = srLocationDao.getAllSrLocations()
+
+    suspend fun seedInitialDataIfEmpty() {
+        try {
+            if (productDao.getProductCount() == 0) {
+                productDao.insertProducts(AppDatabase.initialProducts)
+                retailerDao.insertRetailers(AppDatabase.initialRetailers)
+                srLocationDao.insertLocations(AppDatabase.initialSrLocations)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 
     fun getOrdersByRole(role: String): Flow<List<OrderEntity>> = orderDao.getOrdersByRole(role)
 

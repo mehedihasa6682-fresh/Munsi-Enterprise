@@ -40,60 +40,21 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
-        fun getDatabase(context: Context, scope: CoroutineScope): AppDatabase {
+        fun getDatabase(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
-                var dbRef: AppDatabase? = null
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
                     "ordercut_database"
                 )
                     .fallbackToDestructiveMigration()
-                    .addCallback(object : RoomDatabase.Callback() {
-                        override fun onCreate(db: SupportSQLiteDatabase) {
-                            super.onCreate(db)
-                            scope.launch(Dispatchers.IO) {
-                                dbRef?.let { database ->
-                                    populateInitialData(
-                                        database.productDao(),
-                                        database.retailerDao(),
-                                        database.srLocationDao()
-                                    )
-                                }
-                            }
-                        }
-                    })
                     .build()
-                dbRef = instance
                 INSTANCE = instance
                 instance
             }
         }
 
-        private class AppDatabaseCallback(
-            private val scope: CoroutineScope
-        ) : RoomDatabase.Callback() {
-            override fun onCreate(db: SupportSQLiteDatabase) {
-                super.onCreate(db)
-                INSTANCE?.let { database ->
-                    scope.launch(Dispatchers.IO) {
-                        populateInitialData(
-                            database.productDao(),
-                            database.retailerDao(),
-                            database.srLocationDao()
-                        )
-                    }
-                }
-            }
-        }
-
-        private suspend fun populateInitialData(
-            productDao: ProductDao,
-            retailerDao: RetailerDao,
-            srLocationDao: SrLocationDao
-        ) {
-            // Seed Initial FMCG / Consumer Goods Products with Images & Units (KG, Liter, Bag, Pack, Box)
-            val initialProducts = listOf(
+        val initialProducts = listOf(
                 ProductEntity(
                     name = "Fresh Fortified Soybean Oil 5L",
                     nameBangla = "ফ্রেশ সয়াবিন তেল ৫ লিটার",
@@ -215,7 +176,6 @@ abstract class AppDatabase : RoomDatabase() {
                     imageUrl = "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=500&q=80"
                 )
             )
-            productDao.insertProducts(initialProducts)
 
             // Seed Initial Retailers / Shops
             val initialRetailers = listOf(
@@ -224,7 +184,6 @@ abstract class AppDatabase : RoomDatabase() {
                 RetailerEntity(shopName = "নিউ ঢাকা জেনারেল ট্রেডার্স", ownerName = "মাহাবুব আলম", phone = "01987654321", address = "মতিঝিল শপিং কমপ্লেক্স", routeBeat = "মতিঝিল বিট", dueBalance = 0.0, totalOrdersCount = 22, latitude = 23.7289, longitude = 90.4183),
                 RetailerEntity(shopName = "সোনার বাংলা ডিপার্টমেন্টাল স্টোর", ownerName = "কামরুল হাসান", phone = "01655443322", address = "উত্তরা সেক্টর ৭ বাজার", routeBeat = "উত্তরা বিট", dueBalance = 28000.0, totalOrdersCount = 31, latitude = 23.8722, longitude = 90.3989)
             )
-            retailerDao.insertRetailers(initialRetailers)
 
             // Seed Initial SR Location Trackings
             val initialSrLocations = listOf(
@@ -232,7 +191,5 @@ abstract class AppDatabase : RoomDatabase() {
                 SrLocationEntity(srId = "SR-102", srName = "শাহিন রেজা (SR)", beatRoute = "ধানমন্ডি বিট", latitude = 23.7461, longitude = 90.3742, lastVisitedShop = "মা বাবার দোয়া ট্রেডার্স", ordersTakenToday = 12, status = "ACTIVE"),
                 SrLocationEntity(srId = "DSR-201", srName = "জাহিদুল ইসলাম (DSR)", beatRoute = "মতিঝিল বিট", latitude = 23.7289, longitude = 90.4183, lastVisitedShop = "নিউ ঢাকা ডিপার্টমেন্টাল", ordersTakenToday = 5, status = "ACTIVE")
             )
-            srLocationDao.insertLocations(initialSrLocations)
-        }
     }
 }
