@@ -43,7 +43,7 @@ class OrderRepository(
                 retailerDao.insertRetailers(AppDatabase.initialRetailers)
                 srLocationDao.insertLocations(AppDatabase.initialSrLocations)
             }
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             e.printStackTrace()
         }
     }
