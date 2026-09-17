@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.io.File
@@ -33,23 +34,32 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.seedInitialDataIfEmpty()
+            try {
+                repository.seedInitialDataIfEmpty()
+            } catch (t: Throwable) {
+                t.printStackTrace()
+            }
         }
     }
 
     val allProducts: StateFlow<List<ProductEntity>> = repository.allProducts
+        .catch { e -> e.printStackTrace(); emit(emptyList()) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val lowStockProducts: StateFlow<List<ProductEntity>> = repository.lowStockProducts
+        .catch { e -> e.printStackTrace(); emit(emptyList()) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val allRetailers: StateFlow<List<RetailerEntity>> = repository.allRetailers
+        .catch { e -> e.printStackTrace(); emit(emptyList()) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val allOrders: StateFlow<List<OrderEntity>> = repository.allOrders
+        .catch { e -> e.printStackTrace(); emit(emptyList()) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val allSrLocations: StateFlow<List<SrLocationEntity>> = repository.allSrLocations
+        .catch { e -> e.printStackTrace(); emit(emptyList()) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     private val _selectedRole = MutableStateFlow(UserRole.ADMIN)

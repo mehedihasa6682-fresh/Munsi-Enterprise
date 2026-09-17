@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
         OrderItemEntity::class,
         SrLocationEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -42,15 +42,35 @@ abstract class AppDatabase : RoomDatabase() {
 
         fun getDatabase(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    AppDatabase::class.java,
-                    "ordercut_database"
-                )
-                    .fallbackToDestructiveMigration()
-                    .build()
-                INSTANCE = instance
-                instance
+                try {
+                    val instance = Room.databaseBuilder(
+                        context.applicationContext,
+                        AppDatabase::class.java,
+                        "ordercut_database"
+                    )
+                        .fallbackToDestructiveMigration()
+                        .fallbackToDestructiveMigrationOnDowngrade()
+                        .build()
+                    INSTANCE = instance
+                    instance
+                } catch (t: Throwable) {
+                    t.printStackTrace()
+                    try {
+                        context.applicationContext.deleteDatabase("ordercut_database")
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                    val fallback = Room.databaseBuilder(
+                        context.applicationContext,
+                        AppDatabase::class.java,
+                        "ordercut_database"
+                    )
+                        .fallbackToDestructiveMigration()
+                        .fallbackToDestructiveMigrationOnDowngrade()
+                        .build()
+                    INSTANCE = fallback
+                    fallback
+                }
             }
         }
 

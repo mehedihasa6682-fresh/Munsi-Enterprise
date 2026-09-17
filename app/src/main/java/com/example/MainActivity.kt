@@ -101,7 +101,11 @@ class MainActivity : ComponentActivity() {
                         ActivityResultContracts.RequestPermission()
                     ) { /* Handled gracefully */ }
                     LaunchedEffect(Unit) {
-                        notifPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        try {
+                            notifPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        } catch (t: Throwable) {
+                            t.printStackTrace()
+                        }
                     }
                 }
 
