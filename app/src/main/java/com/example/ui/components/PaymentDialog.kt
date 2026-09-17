@@ -1,5 +1,7 @@
 package com.example.ui.components
 
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -53,7 +55,8 @@ fun PaymentDialog(
     var selectedMethod by remember { mutableStateOf("bKash (বিক্যাশ Gateway)") }
     var discountInput by remember { mutableStateOf("0") }
 
-    val discount = discountInput.toDoubleOrNull() ?: 0.0
+    val rawDiscount = discountInput.toDoubleOrNull() ?: 0.0
+    val discount = rawDiscount.coerceIn(0.0, totalAmount)
     val finalPayable = (totalAmount - discount).coerceAtLeast(0.0)
 
     val methods = listOf(
@@ -73,7 +76,9 @@ fun PaymentDialog(
                 .testTag("payment_dialog_card")
         ) {
             Column(
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState())
             ) {
                 Text(
                     text = "অনলাইন পেমেন্ট ও অর্ডার কনফার্মেশন",

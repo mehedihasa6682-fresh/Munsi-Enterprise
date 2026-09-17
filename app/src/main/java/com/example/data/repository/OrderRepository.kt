@@ -62,7 +62,7 @@ class OrderRepository(
         paymentStatus: String,
         discount: Double = 0.0,
         isOnline: Boolean = true
-    ): Pair<Long, File?> {
+    ): Pair<OrderEntity, File?> {
         val totalAmount = cartItems.sumOf { it.product.tradeOfferPrice * it.quantity }
         val grandTotal = (totalAmount - discount).coerceAtLeast(0.0)
         val orderNo = "ORD-${System.currentTimeMillis().toString().takeLast(6)}"
@@ -122,14 +122,19 @@ class OrderRepository(
         }
 
         // Generate Invoice PDF
-        val pdfFile = PdfInvoiceGenerator.generateInvoicePdf(context, orderEntity.copy(id = orderId), orderItems)
-        if (pdfFile != null) {
-            orderDao.updateOrder(orderEntity.copy(id = orderId, pdfFilePath = pdfFile.absolutePath))
+        val savedOrder = orderEntity.copy(id = orderId)
+        val pdfFile = PdfInvoiceGenerator.generateInvoicePdf(context, savedOrder, orderItems)
+        val finalOrder = if (pdfFile != null) {
+            val updated = savedOrder.copy(pdfFilePath = pdfFile.absolutePath)
+            orderDao.updateOrder(updated)
+            updated
+        } else {
+            savedOrder
         }
 
         NotificationHelper.showOrderSuccessNotification(context, orderNo, grandTotal)
 
-        return Pair(orderId, pdfFile)
+        return Pair(finalOrder, pdfFile)
     }
 
     suspend fun addStock(productId: Long, quantity: Int) {

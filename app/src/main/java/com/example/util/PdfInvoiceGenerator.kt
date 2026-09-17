@@ -96,8 +96,8 @@ object PdfInvoiceGenerator {
         items.forEach { item ->
             canvas.drawText(item.productName.take(35), 40f, y, paint)
             canvas.drawText("${item.quantity} ${item.unit}", 320f, y, paint)
-            canvas.drawText("৳${item.unitPrice}", 380f, y, paint)
-            canvas.drawText("৳${item.totalPrice}", 480f, y, paint)
+            canvas.drawText("Tk ${item.unitPrice}", 380f, y, paint)
+            canvas.drawText("Tk ${item.totalPrice}", 480f, y, paint)
             y += 22f
         }
 
@@ -108,17 +108,17 @@ object PdfInvoiceGenerator {
         y += 25f
         paint.textSize = 11f
         canvas.drawText("Sub Total:", 380f, y, paint)
-        canvas.drawText("৳${order.totalAmount}", 480f, y, paint)
+        canvas.drawText("Tk ${order.totalAmount}", 480f, y, paint)
 
         y += 20f
         canvas.drawText("Discount:", 380f, y, paint)
-        canvas.drawText("- ৳${order.discountAmount}", 480f, y, paint)
+        canvas.drawText("- Tk ${order.discountAmount}", 480f, y, paint)
 
         y += 25f
         boldPaint.textSize = 13f
         boldPaint.color = Color.parseColor("#0284C7")
         canvas.drawText("Grand Total:", 380f, y, boldPaint)
-        canvas.drawText("৳${order.grandTotal}", 480f, y, boldPaint)
+        canvas.drawText("Tk ${order.grandTotal}", 480f, y, boldPaint)
 
         y += 25f
         paint.color = Color.parseColor("#059669")
@@ -137,15 +137,20 @@ object PdfInvoiceGenerator {
 
         return try {
             val fileDir = context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS) ?: context.filesDir
+            if (!fileDir.exists()) {
+                fileDir.mkdirs()
+            }
             val pdfFile = File(fileDir, "Invoice_${order.orderNo}.pdf")
-            val outputStream = FileOutputStream(pdfFile)
-            pdfDocument.writeTo(outputStream)
-            outputStream.close()
+            FileOutputStream(pdfFile).use { outputStream ->
+                pdfDocument.writeTo(outputStream)
+            }
             pdfDocument.close()
             pdfFile
         } catch (e: Exception) {
             e.printStackTrace()
-            pdfDocument.close()
+            try {
+                pdfDocument.close()
+            } catch (_: Exception) {}
             null
         }
     }

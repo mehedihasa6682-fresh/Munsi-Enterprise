@@ -2,7 +2,9 @@ package com.example.ui.components
 
 import android.content.Context
 import android.content.Intent
+import android.content.ActivityNotFoundException
 import android.net.Uri
+import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -173,27 +175,43 @@ fun InvoicePdfDialog(
 
 private fun sharePdf(context: Context, file: File) {
     try {
+        if (!file.exists()) {
+            Toast.makeText(context, "ইনভয়েস ফাইলটি খুঁজে পাওয়া যায়নি", Toast.LENGTH_SHORT).show()
+            return
+        }
         val uri: Uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
             type = "application/pdf"
             putExtra(Intent.EXTRA_STREAM, uri)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
-        context.startActivity(Intent.createChooser(shareIntent, "ইনভয়েস পিডিএফ শেয়ার করুন"))
+        val chooser = Intent.createChooser(shareIntent, "ইনভয়েস পিডিএফ শেয়ার করুন").apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        context.startActivity(chooser)
     } catch (e: Exception) {
         e.printStackTrace()
+        Toast.makeText(context, "ইনভয়েস শেয়ার করতে সমস্যা হয়েছে: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
     }
 }
 
 private fun openPdf(context: Context, file: File) {
     try {
+        if (!file.exists()) {
+            Toast.makeText(context, "ইনভয়েস ফাইলটি খুঁজে পাওয়া যায়নি", Toast.LENGTH_SHORT).show()
+            return
+        }
         val uri: Uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
         val intent = Intent(Intent.ACTION_VIEW).apply {
             setDataAndType(uri, "application/pdf")
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         context.startActivity(intent)
+    } catch (e: ActivityNotFoundException) {
+        Toast.makeText(context, "পিডিএফ দেখার কোনো অ্যাপ নেই। শেয়ার অপশন ব্যবহার করুন।", Toast.LENGTH_LONG).show()
     } catch (e: Exception) {
         e.printStackTrace()
+        Toast.makeText(context, "পিডিএফ ওপেন করতে সমস্যা হয়েছে: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
     }
 }

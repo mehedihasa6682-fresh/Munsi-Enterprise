@@ -1,5 +1,7 @@
 package com.example.ui.screens
 
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -272,7 +274,11 @@ fun InventoryManagementScreen(
                     .fillMaxWidth()
                     .padding(12.dp)
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
                     Text(text = "নতুন পণ্য এন্ট্রি (Add Product)", fontWeight = FontWeight.Bold, fontSize = 16.sp)
 
                     Spacer(modifier = Modifier.height(10.dp))

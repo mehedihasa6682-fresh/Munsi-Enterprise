@@ -131,8 +131,25 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         if (index != -1) {
             val product = currentList[index].product
             val validQty = newQty.coerceAtMost(product.stockQuantity)
+            if (newQty > product.stockQuantity) {
+                _snackMessage.value = "${product.nameBangla} এর সর্বোচ্চ স্টক ${product.stockQuantity} টি!"
+            }
             currentList[index] = currentList[index].copy(quantity = validQty)
             _cart.value = currentList
+        } else {
+            val product = _allProducts.value.find { it.id == productId }
+            if (product != null) {
+                val validQty = newQty.coerceAtMost(product.stockQuantity)
+                if (validQty > 0) {
+                    if (newQty > product.stockQuantity) {
+                        _snackMessage.value = "${product.nameBangla} এর সর্বোচ্চ স্টক ${product.stockQuantity} টি!"
+                    }
+                    currentList.add(CartItem(product, validQty))
+                    _cart.value = currentList
+                } else {
+                    _snackMessage.value = "দুঃখিত, স্টক শেষ হয়ে গেছে!"
+                }
+            }
         }
     }
 
@@ -173,24 +190,28 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         viewModelScope.launch {
-            val (orderId, pdfFile) = repository.createOrder(
-                retailer = retailer,
-                srName = srName,
-                srId = srId,
-                userRole = _selectedRole.value.name,
-                cartItems = _cart.value,
-                paymentMethod = paymentMethod,
-                paymentStatus = paymentStatus,
-                discount = discount,
-                isOnline = _isOnline.value
-            )
+            try {
+                val (createdOrder, pdfFile) = repository.createOrder(
+                    retailer = retailer,
+                    srName = srName,
+                    srId = srId,
+                    userRole = _selectedRole.value.name,
+                    cartItems = _cart.value,
+                    paymentMethod = paymentMethod,
+                    paymentStatus = paymentStatus,
+                    discount = discount,
+                    isOnline = _isOnline.value
+                )
 
-            val orderObj = allOrders.value.find { it.id == orderId }
-            _lastPlacedOrder.value = orderObj
-            _lastGeneratedInvoice.value = pdfFile
-            _showInvoiceDialog.value = true
-            clearCart()
-            _snackMessage.value = "অর্ডার কাটিং সফল হয়েছে! ইনভয়েস তৈরি হয়েছে।"
+                _lastPlacedOrder.value = createdOrder
+                _lastGeneratedInvoice.value = pdfFile
+                _showInvoiceDialog.value = true
+                clearCart()
+                _snackMessage.value = "অর্ডার কাটিং সফল হয়েছে! ইনভয়েস তৈরি হয়েছে।"
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _snackMessage.value = "অর্ডার সংরক্ষণে সমস্যা হয়েছে: ${e.localizedMessage}"
+            }
         }
     }
 
