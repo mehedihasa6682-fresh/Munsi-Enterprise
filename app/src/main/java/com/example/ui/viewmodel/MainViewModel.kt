@@ -219,6 +219,24 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _showInvoiceDialog.value = false
     }
 
+    fun viewInvoiceForOrder(order: OrderEntity) {
+        viewModelScope.launch {
+            try {
+                val file = if (!order.pdfFilePath.isNullOrEmpty() && File(order.pdfFilePath).exists()) {
+                    File(order.pdfFilePath)
+                } else {
+                    repository.regenerateInvoicePdf(order)
+                }
+                _lastPlacedOrder.value = order
+                _lastGeneratedInvoice.value = file
+                _showInvoiceDialog.value = true
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _snackMessage.value = "ইনভয়েস লোড করতে সমস্যা হয়েছে: ${e.localizedMessage}"
+            }
+        }
+    }
+
     fun toggleOnlineStatus() {
         _isOnline.value = !_isOnline.value
         _snackMessage.value = if (_isOnline.value) "অনলাইন মোড চালু হয়েছে" else "অফলাইন মোড চালু হয়েছে - অর্ডার লোকাল ডেটাবেজে জমা হবে"

@@ -52,6 +52,7 @@ import java.util.Locale
 @Composable
 fun OrderHistoryScreen(
     orders: List<OrderEntity>,
+    onViewInvoice: (OrderEntity) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -181,25 +182,24 @@ fun OrderHistoryScreen(
 
                                 // PDF actions
                                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                    Button(
+                                        onClick = { onViewInvoice(order) },
+                                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0F172A)),
+                                        shape = RoundedCornerShape(8.dp),
+                                        modifier = Modifier.testTag("btn_view_pdf_${order.orderNo}")
+                                    ) {
+                                        Icon(imageVector = Icons.Default.PictureAsPdf, contentDescription = "PDF", modifier = Modifier.size(14.dp))
+                                        Text("ইনভয়েস দেখুন", fontSize = 11.sp, modifier = Modifier.padding(start = 4.dp))
+                                    }
+
                                     if (!order.pdfFilePath.isNullOrEmpty()) {
                                         val pdfFile = File(order.pdfFilePath)
-
                                         OutlinedButton(
                                             onClick = { sharePdf(context, pdfFile) },
                                             shape = RoundedCornerShape(8.dp),
                                             modifier = Modifier.testTag("btn_share_pdf_${order.orderNo}")
                                         ) {
                                             Icon(imageVector = Icons.Default.Share, contentDescription = "Share", modifier = Modifier.size(14.dp))
-                                        }
-
-                                        Button(
-                                            onClick = { viewPdf(context, pdfFile) },
-                                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0F172A)),
-                                            shape = RoundedCornerShape(8.dp),
-                                            modifier = Modifier.testTag("btn_view_pdf_${order.orderNo}")
-                                        ) {
-                                            Icon(imageVector = Icons.Default.PictureAsPdf, contentDescription = "PDF", modifier = Modifier.size(14.dp))
-                                            Text("PDF মেমো", fontSize = 11.sp, modifier = Modifier.padding(start = 2.dp))
                                         }
                                     }
                                 }

@@ -13,6 +13,9 @@ interface SrLocationDao {
     @Query("SELECT * FROM sr_locations ORDER BY lastUpdatedTime DESC")
     fun getAllSrLocations(): Flow<List<SrLocationEntity>>
 
+    @Query("SELECT COUNT(*) FROM sr_locations")
+    suspend fun getLocationCount(): Int
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertLocations(locations: List<SrLocationEntity>)
 

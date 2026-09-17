@@ -13,6 +13,9 @@ interface RetailerDao {
     @Query("SELECT * FROM retailers ORDER BY shopName ASC")
     fun getAllRetailers(): Flow<List<RetailerEntity>>
 
+    @Query("SELECT COUNT(*) FROM retailers")
+    suspend fun getRetailerCount(): Int
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertRetailers(retailers: List<RetailerEntity>)
 

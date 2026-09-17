@@ -142,7 +142,7 @@ fun LiveTrackingScreen(
                         .align(Alignment.BottomEnd)
                         .padding(end = 30.dp, bottom = 20.dp)
                 ) {
-                    MapPinBadge("DSR-201: জাহিদ", Color(0xEAB30800).copy(alpha = 1f))
+                    MapPinBadge("DSR-201: জাহিদ", Color(0xFFEAB308))
                 }
             }
         }

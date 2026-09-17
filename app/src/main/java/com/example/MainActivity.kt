@@ -1,9 +1,13 @@
 package com.example
 
+import android.Manifest
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -91,6 +95,15 @@ class MainActivity : ComponentActivity() {
                 val snackbarHostState = remember { SnackbarHostState() }
                 var currentTab by remember { mutableIntStateOf(0) }
                 var showPaymentDialog by remember { mutableStateOf(false) }
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    val notifPermissionLauncher = rememberLauncherForActivityResult(
+                        ActivityResultContracts.RequestPermission()
+                    ) { /* Handled gracefully */ }
+                    LaunchedEffect(Unit) {
+                        notifPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                }
 
                 LaunchedEffect(snackMessage) {
                     snackMessage?.let { msg ->
@@ -272,7 +285,8 @@ class MainActivity : ComponentActivity() {
                                 )
 
                                 5 -> OrderHistoryScreen(
-                                    orders = orders
+                                    orders = orders,
+                                    onViewInvoice = { viewModel.viewInvoiceForOrder(it) }
                                 )
                             }
                         }

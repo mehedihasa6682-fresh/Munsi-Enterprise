@@ -40,11 +40,30 @@ class OrderRepository(
         try {
             if (productDao.getProductCount() == 0) {
                 productDao.insertProducts(AppDatabase.initialProducts)
+            }
+            if (retailerDao.getRetailerCount() == 0) {
                 retailerDao.insertRetailers(AppDatabase.initialRetailers)
+            }
+            if (srLocationDao.getLocationCount() == 0) {
                 srLocationDao.insertLocations(AppDatabase.initialSrLocations)
             }
         } catch (e: Throwable) {
             e.printStackTrace()
+        }
+    }
+
+    suspend fun regenerateInvoicePdf(order: OrderEntity): File? {
+        return try {
+            val items = orderDao.getOrderItems(order.id)
+            val pdfFile = PdfInvoiceGenerator.generateInvoicePdf(context, order, items)
+            if (pdfFile != null && pdfFile.exists()) {
+                val updated = order.copy(pdfFilePath = pdfFile.absolutePath)
+                orderDao.updateOrder(updated)
+            }
+            pdfFile
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
         }
     }
 
